@@ -179,7 +179,8 @@ int main(void)
 // Using the lowest kick speed to begin with, increment through the angles from low to high until one is found that gets 
 // the ball over the bar. If none found increase the speed and repeat. Rationale: it's better to use as little 
 // energy in the kick as possible! DeltaD is used as the increment for both angle and speed.
-bool test = false;
+bool test = true;
+bool test2 = true;
 bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 {
 	// *** reminders ***
@@ -194,7 +195,8 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 	float height;
 	bool foundCombo(false);		// Found combination of speed and angle that gets ball over bar?
 
-	
+	float gravityTimesX = (-g * x*x);
+
 
 	while (!foundCombo && !(nextAngle > maxAngle))				// Think de Morgan's Theory, perhaps.
 	{
@@ -204,6 +206,9 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 		float cosAngleRads = cos(AngleRads);
 		float tanAngleRads = tan(AngleRads);
 
+		float TwoTimesSquareOfCosAngleRad = 2.0F * cosAngleRads * cosAngleRads;
+		float XTimesTanAngleRads = (x * tanAngleRads);
+		
 		while (!foundCombo && !(nextSpeed > maxSpeed))
 		{
 			// Figure out height of ball at goal post distance (x), using classic trajectory equation...
@@ -214,7 +219,10 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 			// Note: height could become negative if ball hits ground short of posts (and theoretically keeps going underground!).
 			// Note: Max horizontal distance can be calculated from = (speed^2) * sin(2*angle)/g
 
-			height = ((-g * x*x) / (2.0F * cosAngleRads * cosAngleRads * (nextSpeed*nextSpeed))) + (x * tanAngleRads);	//Phew!
+			height = (gravityTimesX / (TwoTimesSquareOfCosAngleRad * (nextSpeed*nextSpeed))) + XTimesTanAngleRads;	//Phew!
+			
+
+
 #ifdef _longTrace  // Echo results to screen as calculations proceed (can be lengthy, be patient! Very patient.)
 			cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
 #endif //_longTrace
