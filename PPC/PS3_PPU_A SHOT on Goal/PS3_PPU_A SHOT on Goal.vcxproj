@@ -60,8 +60,11 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="A SHOT on Goal.cpp" />
     <ClCompile Include="gccpch.h" />
-    <ClCompile Include="Student Runs 2017.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="hr_time.h" />
   </ItemGroup>
   <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

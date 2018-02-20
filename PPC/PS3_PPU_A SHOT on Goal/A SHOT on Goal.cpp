@@ -18,7 +18,7 @@ Adrian Oram, March 2017 (not a rugby supporter, so don't ask!)
 #define yourName     "Adrian Oram"				// Please change these as appropriate!
 #define yourTeamName "Fulchester RC"
 
-#define _PS3		// Build for PS3 system otherwise x86 if commented out.
+#define _PS3		// Build for PS3 system otherwise x86 if commented out. (You will need to create an x86 project and paste all required files across.)
 //#define _trace	// comment out to remove trace output used for testing
 //#define _longTrace	// comment out to avoid lengthy trace of trial height calculations
 
@@ -233,7 +233,7 @@ void generateFlightPath(float speed, float angle)
 	//const int maxDataPoints = 104
 	//const float maxHeight(8.5F);	// (m) trajectories above this height can't be displayed (out the park!)
 
-	float yValue(0.001F);	// ball is sitting on a tee just above the ground begin with, of course!
+	float yValue(0.001F);	// ball is sitting on a tee just above the ground to begin with, of course!
 	float xValue(0.0F);		// ...and hasn't moved yet.
 	const float AngleRads = (angle * (Pi / 180.0F));	// Need radians for cos and tan functions 
 

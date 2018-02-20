@@ -14,8 +14,13 @@
     <ClCompile Include="gccpch.h">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Student Runs 2017.cpp">
+    <ClCompile Include="A SHOT on Goal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="hr_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

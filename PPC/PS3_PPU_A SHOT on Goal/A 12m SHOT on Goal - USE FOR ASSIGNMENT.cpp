@@ -240,7 +240,7 @@ void generateFlightPath(float speed, float angle)
 	//const int maxDataPoints = 104
 	//const float maxHeight(8.5F);	// (m) trajectories above this height can't be displayed (out the park!)
 
-	float yValue(0.001F);	// ball is sitting on a tee just above the ground begin with, of course!
+	float yValue(0.001F);	// ball is sitting on a tee just above the ground to begin with, of course!
 	float xValue(0.0F);		// ...and hasn't moved yet.
 	const float AngleRads = (angle * (Pi / 180.0F));	// Need radians for cos and tan functions 
 
@@ -258,6 +258,10 @@ void generateFlightPath(float speed, float angle)
 	flightPath[i][x] = dataEnd;
 	flightPath[i][y] = dataEnd;
 }
+
+
+
+
 
 
 //************************************ Supporting functions *******************************************************
