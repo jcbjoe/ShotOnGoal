@@ -109,8 +109,8 @@ int main(void)
 {
 	bool foundCombo(false);
 
-	getDistanceToKick(&distanceToGoal);	// comment this out if required
-	//distanceToGoal = 12.0F;  //***SHOT use this rather than entering it each run!
+	//getDistanceToKick(&distanceToGoal);	// comment this out if required
+	distanceToGoal = 12.0F;  //***SHOT use this rather than entering it each run!
 
 	cout << "\nYou entered " << distanceToGoal << " metres. Looking for solution for kick speed and angle...";
 	fflush(stdout);	//PS3 console fix
@@ -196,21 +196,36 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 	bool foundCombo(false);		// Found combination of speed and angle that gets ball over bar?
 
 	float gravityTimesX = (-g * x*x);
-
+	float InversegravityTimesX =  1.0 / (-g * x*x);
 
 	while (!foundCombo && !(nextAngle > maxAngle))				// Think de Morgan's Theory, perhaps.
 	{
 		float AngleRads = (nextAngle * 0.01745329251994F);			// Need radians for cos and tan functions
 		nextSpeed = minSpeed;									// reset minimum speed 
+		nextSpeed = minSpeed;									// reset minimum speed 
+								// reset minimum speed 
 
+		
+		///////////////////////////////////////////////////////
 		float cosAngleRads = cos(AngleRads);
 		float tanAngleRads = tan(AngleRads);
-
-		float TwoTimesSquareOfCosAngleRad = 2.0F * cosAngleRads * cosAngleRads;
-		float XTimesTanAngleRads = (x * tanAngleRads);
+		float InversecosAngleRads = 1.0f / cosAngleRads;
+		float InversetanAngleRads = 1.0f / tanAngleRads;
 		
-		while (!foundCombo && !(nextSpeed > maxSpeed))
+		float TwoTimesSquareOfCosAngleRad = 2.0F * cosAngleRads * cosAngleRads;
+		//float TwoTimesSquareOfCosAngleRad = 2.0F * InversecosAngleRads * InversecosAngleRads;
+		float  InverseTwoTimesSquareOfCosAngleRad = 1.0f / TwoTimesSquareOfCosAngleRad;
+		float XTimesTanAngleRads = (x * tanAngleRads);
+	//	float InverseXTimesTanAngleRads = 1.0 /XTimesTanAngleRads; //inverse version
+
+	
+		
+
+		
+	do
 		{
+		float InversenextSpeed = 1.0f / nextSpeed;
+		
 			// Figure out height of ball at goal post distance (x), using classic trajectory equation...
 			//
 			//			height =  (-g * x^2)/(2 * cos(angle)^2 * speed^2) + (x * tan(angle))
@@ -219,9 +234,14 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 			// Note: height could become negative if ball hits ground short of posts (and theoretically keeps going underground!).
 			// Note: Max horizontal distance can be calculated from = (speed^2) * sin(2*angle)/g
 
-			height = (gravityTimesX / (TwoTimesSquareOfCosAngleRad * (nextSpeed*nextSpeed))) + XTimesTanAngleRads;	//Phew!
-			
+			float height = gravityTimesX * (InverseTwoTimesSquareOfCosAngleRad * (InversenextSpeed*InversenextSpeed)) + (XTimesTanAngleRads);
 
+
+		
+
+
+			
+		//	cout << height;
 
 #ifdef _longTrace  // Echo results to screen as calculations proceed (can be lengthy, be patient! Very patient.)
 			cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
@@ -233,8 +253,10 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 				*angle = nextAngle;
 				foundCombo = true;			// ... and stop looking.
 			}
-			else nextSpeed += deltaD;		// Otherwise try next speed up (+0.5 m/s).
-		}
+			else {
+				nextSpeed += deltaD;		// Otherwise try next speed up (+0.5 m/s).#
+			}
+	} while (!foundCombo && !(nextSpeed > maxSpeed));
 		nextAngle += deltaD;	// no joy, try next angle up (+0.5 degrees).
 	}
 	return (foundCombo);
