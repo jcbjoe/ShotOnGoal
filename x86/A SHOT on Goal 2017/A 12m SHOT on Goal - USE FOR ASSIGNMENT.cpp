@@ -61,6 +61,7 @@ const int repeats = 10000;				// Repeat timings to help avoid exceptions, and re
 double SpeedAndAngleTime(1.0e6);		// Set high intially.
 double GenerateFlightPathTime(1.0e6);
 
+
 // Some constants
 const float g(9.81F);					// (m/s/s) gravity
 const float Pi(3.14159265358979323846F);// This value stolen from M_PI defines in Math.h) - used to convert degrees to radians
@@ -202,8 +203,6 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 	{
 		float AngleRads = (nextAngle * 0.01745329251994F);			// Need radians for cos and tan functions
 		nextSpeed = minSpeed;									// reset minimum speed 
-		nextSpeed = minSpeed;									// reset minimum speed 
-								// reset minimum speed 
 
 		
 		///////////////////////////////////////////////////////
@@ -218,35 +217,21 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 		float XTimesTanAngleRads = (x * tanAngleRads);
 	//	float InverseXTimesTanAngleRads = 1.0 /XTimesTanAngleRads; //inverse version
 
-	
-		
+
 
 		
-	do
+		do
 		{
-		float InversenextSpeed = 1.0f / nextSpeed;
-		
-			// Figure out height of ball at goal post distance (x), using classic trajectory equation...
-			//
-			//			height =  (-g * x^2)/(2 * cos(angle)^2 * speed^2) + (x * tan(angle))
-			//
-			// If this is > cross bar height (plus any margin allowed) then result! 
-			// Note: height could become negative if ball hits ground short of posts (and theoretically keeps going underground!).
-			// Note: Max horizontal distance can be calculated from = (speed^2) * sin(2*angle)/g
 
+			float InversenextSpeed = 1.0 / nextSpeed;
+		
 			float height = gravityTimesX * (InverseTwoTimesSquareOfCosAngleRad * (InversenextSpeed*InversenextSpeed)) + (XTimesTanAngleRads);
 
+			//cout << " << " << nextSpeed;
 
-		
-
-
-			
-		//	cout << height;
-
-#ifdef _longTrace  // Echo results to screen as calculations proceed (can be lengthy, be patient! Very patient.)
-			cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
-#endif //_longTrace
-
+			#ifdef _longTrace  // Echo results to screen as calculations proceed (can be lengthy, be patient! Very patient.)
+						cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
+			#endif //_longTrace
 			if (height > crossBarHeight + margin)	// Success! 
 			{
 				*speed = nextSpeed;			// Record the working combination...
@@ -256,8 +241,11 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 			else {
 				nextSpeed += deltaD;		// Otherwise try next speed up (+0.5 m/s).#
 			}
-	} while (!foundCombo && !(nextSpeed > maxSpeed));
+		} while (!foundCombo && !(nextSpeed > maxSpeed));
+				
 		nextAngle += deltaD;	// no joy, try next angle up (+0.5 degrees).
+		
+	
 	}
 	return (foundCombo);
 }
