@@ -15,8 +15,8 @@ Units are (m) metres, (s) seconds, (deg) degrees, all float values.
 Adrian Oram, March 2017 (not a rugby supporter, so don't ask!)
 */
 
-#define yourName     "Adrian Oram"				// Please change these as appropriate!
-#define yourTeamName "Fulchester RC"
+#define yourName     "Mitch Peake && Joe Garlick"			// Please change these as appropriate!
+#define yourTeamName "Bad Mother Truckers"
 
 #define _PS3		// Build for PS3 system otherwise x86 if commented out. (You will need to create an x86 project and paste all required files across.)
 //#define _trace	// comment out to remove trace output used for testing

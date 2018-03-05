@@ -279,6 +279,9 @@ void generateFlightPath(float speed, float angle)
 	float speepPowerTwo = speed * speed;
 
 	float alotaMultiplicationThing = (2.0F * cosAngleRads * cosAngleRads * speepPowerTwo);
+	float InversealotaMultiplicationThing = 1/  alotaMultiplicationThing;
+	
+
 
 	int i(0);
 	for (; i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight); ++i)	// If height goes negative or too high, STOP!
@@ -288,7 +291,7 @@ void generateFlightPath(float speed, float angle)
 		xValue += deltaD;			// do for each increment tick across the pitch
 
 		// find the 'y' (height) for each 'x' distance using the angle and speed previously found (same equation as above)
-		yValue = ((-g * xValue * xValue) / alotaMultiplicationThing) + (xValue * tanAngleRads);
+		yValue = ((-g * xValue * xValue) * InversealotaMultiplicationThing) + (xValue * tanAngleRads);
 	}
 	// Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)
 	flightPath[i][x] = dataEnd;
