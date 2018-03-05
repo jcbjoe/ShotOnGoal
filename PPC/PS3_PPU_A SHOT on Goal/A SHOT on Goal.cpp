@@ -74,8 +74,12 @@ const double milli(1.0e3F);				// scaling factor to give milliseconds
 
 
 // Kick metrics
-const float minAngle(15.0F);	// (deg) pretty low!
-const float maxAngle(45.0F);	// (deg) pretty steep. It becomes increasingly difficult to put enough energy into a ball at angles above 45 deg.
+//const float minAngle(15.0F);	// (deg) pretty low!
+//const float maxAngle(45.0F);	// (deg) pretty steep. It becomes increasingly difficult to put enough energy into a ball at angles above 45 deg.
+
+const float minAngle(18.0F);	// (deg) pretty low!
+const float maxAngle(23.0F);	// (deg) pretty steep. It becomes increasingly difficult to put enough energy into a ball at angles above 45 deg.
+
 const float minSpeed(5.0F);		// (m/s) pretty pathetic!
 const float maxSpeed(32.0F);	// (m/s) who let Superman on the pitch!? Research indicates that 26 +/-1.7 m/s is optimal kick speed.
 const float maxHeight(8.5F);	// (m)   trajectories above this height can't be displayed (out the park!)
@@ -175,7 +179,8 @@ int main(void)
 // Using the lowest kick speed to begin with, increment through the angles from low to high until one is found that gets 
 // the ball over the bar. If none found increase the speed and repeat. Rationale: it's better to use as little 
 // energy in the kick as possible! DeltaD is used as the increment for both angle and speed.
-
+bool test = true;
+bool test2 = true;
 bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 {
 	// *** reminders ***
@@ -188,16 +193,39 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 	float nextSpeed;
 	float nextAngle(minAngle);	// Start with shallowest angle...
 	float height;
-
 	bool foundCombo(false);		// Found combination of speed and angle that gets ball over bar?
+
+	float gravityTimesX = (-g * x*x);
+	float InversegravityTimesX = 1.0 / (-g * x*x);
 
 	while (!foundCombo && !(nextAngle > maxAngle))				// Think de Morgan's Theory, perhaps.
 	{
-		float AngleRads = (nextAngle * (Pi / 180.0F));			// Need radians for cos and tan functions
+		float AngleRads = (nextAngle * 0.01745329251994F);			// Need radians for cos and tan functions
 		nextSpeed = minSpeed;									// reset minimum speed 
+		nextSpeed = minSpeed;									// reset minimum speed 
+		// reset minimum speed 
 
-		while (!foundCombo && !(nextSpeed > maxSpeed))
+
+		///////////////////////////////////////////////////////
+		float cosAngleRads = cos(AngleRads);
+		float tanAngleRads = tan(AngleRads);
+		float InversecosAngleRads = 1.0f / cosAngleRads;
+		float InversetanAngleRads = 1.0f / tanAngleRads;
+
+		float TwoTimesSquareOfCosAngleRad = 2.0F * cosAngleRads * cosAngleRads;
+		//float TwoTimesSquareOfCosAngleRad = 2.0F * InversecosAngleRads * InversecosAngleRads;
+		float  InverseTwoTimesSquareOfCosAngleRad = 1.0f / TwoTimesSquareOfCosAngleRad;
+		float XTimesTanAngleRads = (x * tanAngleRads);
+		//	float InverseXTimesTanAngleRads = 1.0 /XTimesTanAngleRads; //inverse version
+
+
+
+
+
+		do
 		{
+			float InversenextSpeed = 1.0f / nextSpeed;
+
 			// Figure out height of ball at goal post distance (x), using classic trajectory equation...
 			//
 			//			height =  (-g * x^2)/(2 * cos(angle)^2 * speed^2) + (x * tan(angle))
@@ -206,9 +234,16 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 			// Note: height could become negative if ball hits ground short of posts (and theoretically keeps going underground!).
 			// Note: Max horizontal distance can be calculated from = (speed^2) * sin(2*angle)/g
 
-			height = ((-g * x*x) / (2.0F *cos(AngleRads) *cos(AngleRads) * (nextSpeed*nextSpeed))) + (x *tan(AngleRads));	//Phew!
-			
-#ifdef _longTrace  // echo to screen as calculations proceed (can be lengthy, be patient!)
+			float height = gravityTimesX * (InverseTwoTimesSquareOfCosAngleRad * (InversenextSpeed*InversenextSpeed)) + (XTimesTanAngleRads);
+
+
+
+
+
+
+			//	cout << height;
+
+#ifdef _longTrace  // Echo results to screen as calculations proceed (can be lengthy, be patient! Very patient.)
 			cout << setw(4) << setprecision(4) << "\nHeight found for speed " << nextSpeed << "m/s\t\t= " << height << " m,\t\tkicking at angle " << nextAngle << " degrees";
 #endif //_longTrace
 
@@ -218,8 +253,10 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 				*angle = nextAngle;
 				foundCombo = true;			// ... and stop looking.
 			}
-			else nextSpeed += deltaD;		// Otherwise try next speed up (+0.5 m/s).
-		}
+			else {
+				nextSpeed += deltaD;		// Otherwise try next speed up (+0.5 m/s).#
+			}
+		} while (!foundCombo && !(nextSpeed > maxSpeed));
 		nextAngle += deltaD;	// no joy, try next angle up (+0.5 degrees).
 	}
 	return (foundCombo);
@@ -233,9 +270,18 @@ void generateFlightPath(float speed, float angle)
 	//const int maxDataPoints = 104
 	//const float maxHeight(8.5F);	// (m) trajectories above this height can't be displayed (out the park!)
 
-	float yValue(0.001F);	// ball is sitting on a tee just above the ground to begin with, of course!
+	float yValue(0.001F);	// ball is sitting on a tee just above the ground begin with, of course!
 	float xValue(0.0F);		// ...and hasn't moved yet.
-	const float AngleRads = (angle * (Pi / 180.0F));	// Need radians for cos and tan functions 
+	const float AngleRads = (angle * 0.01745329251994F);	// Need radians for cos and tan functions 
+
+	float cosAngleRads = cos(AngleRads);
+	float tanAngleRads = tan(AngleRads);
+	float speepPowerTwo = speed * speed;
+
+	float alotaMultiplicationThing = (2.0F * cosAngleRads * cosAngleRads * speepPowerTwo);
+	float InversealotaMultiplicationThing = 1 / alotaMultiplicationThing;
+
+
 
 	int i(0);
 	for (; i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight); ++i)	// If height goes negative or too high, STOP!
@@ -245,12 +291,13 @@ void generateFlightPath(float speed, float angle)
 		xValue += deltaD;			// do for each increment tick across the pitch
 
 		// find the 'y' (height) for each 'x' distance using the angle and speed previously found (same equation as above)
-		yValue = ((-g * xValue * xValue) / (2.0F * cos(AngleRads) * cos(AngleRads) * (speed * speed))) + (xValue * tan(AngleRads));
+		yValue = ((-g * xValue * xValue) * InversealotaMultiplicationThing) + (xValue * tanAngleRads);
 	}
 	// Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)
 	flightPath[i][x] = dataEnd;
 	flightPath[i][y] = dataEnd;
 }
+
 
 //************************************ Supporting functions *******************************************************
 //*****************************************************************************************************************

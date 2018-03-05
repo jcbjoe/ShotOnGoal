@@ -279,7 +279,7 @@ void generateFlightPath(float speed, float angle)
 	float speepPowerTwo = speed * speed;
 
 	float alotaMultiplicationThing = (2.0F * cosAngleRads * cosAngleRads * speepPowerTwo);
-	float InversealotaMultiplicationThing = 1/  alotaMultiplicationThing;
+	float InversealotaMultiplicationThing = 1 /  alotaMultiplicationThing;
 	
 
 
