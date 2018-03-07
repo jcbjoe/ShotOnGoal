@@ -57,6 +57,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <OptimizationLevel>Level2</OptimizationLevel>
       <FastMath>true</FastMath>
+      <UnrollLoops>false</UnrollLoops>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
