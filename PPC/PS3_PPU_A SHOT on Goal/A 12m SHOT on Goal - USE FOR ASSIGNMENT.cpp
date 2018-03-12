@@ -89,6 +89,7 @@ const float minSpeed(5.0F);		// (m/s) pretty pathetic!
 const float maxSpeed(32.0F);	// (m/s) who let Superman on the pitch!? Research indicates that 26 +/-1.7 m/s is optimal kick speed.
 const float maxHeight(8.5F);	// (m)   trajectories above this height can't be displayed (out the park!)
 
+
 const float xValueSquaredTimesGravity[104] = {
 	-2.4525,
 	-9.81,
@@ -306,6 +307,8 @@ const float tanAnglesValues[10] = {
 	0.414214
 };
 
+
+
 float kickSpeed;				// (m/s) calculated
 float kickAngle;				// (deg) calculated
 
@@ -326,7 +329,120 @@ const float xScale = 1.0F / deltaD;	// horizontal scaling factor
 const int maxDataPoints = (int)((maxDistanceToGoal + 2.0F) / deltaD);	// =104, calculate a data point for each 0.5 metre along
 // +2.0 so that ball appears beyond the goal at maxDistance
 
-float flightPath[104 + 1][2];			// x,y coords (m,m) of ball flight. The sequence terminates with 'dataEnd' if fewer than maxDataPoints used.
+float flightPath[104 + 1][2] = 
+{
+	{ 0, 0.0 },
+	{ 0.5, 0.0 },
+	{ 1, 0.0 },
+	{ 1.5, 0.0 },
+	{ 2, 0.0 },
+	{ 2.5, 0.0 },
+	{ 3, 0.0 },
+	{ 3.5, 0.0 },
+	{ 4, 0.0 },
+	{ 4.5, 0.0 },
+	{ 5, 0.0 },
+	{ 5.5, 0.0 },
+	{ 6, 0.0 },
+	{ 6.5, 0.0 },
+	{ 7, 0.0 },
+	{ 7.5, 0.0 },
+	{ 8, 0.0 },
+	{ 8.5, 0.0 },
+	{ 9, 0.0 },
+	{ 9.5, 0.0 },
+	{ 10, 0.0 },
+	{ 10.5, 0.0 },
+	{ 11, 0.0 },
+	{ 11.5, 0.0 },
+	{ 12, 0.0 },
+	{ 12.5, 0.0 },
+	{ 13, 0.0 },
+	{ 13.5, 0.0 },
+	{ 14, 0.0 },
+	{ 14.5, 0.0 },
+	{ 15, 0.0 },
+	{ 15.5, 0.0 },
+	{ 16, 0.0 },
+	{ 16.5, 0.0 },
+	{ 17, 0.0 },
+	{ 17.5, 0.0 },
+	{ 18, 0.0 },
+	{ 18.5, 0.0 },
+	{ 19, 0.0 },
+	{ 19.5, 0.0 },
+	{ 20, 0.0 },
+	{ 20.5, 0.0 },
+	{ 21, 0.0 },
+	{ 21.5, 0.0 },
+	{ 22, 0.0 },
+	{ 22.5, 0.0 },
+	{ 23, 0.0 },
+	{ 23.5, 0.0 },
+	{ 24, 0.0 },
+	{ 24.5, 0.0 },
+	{ 25, 0.0 },
+	{ 25.5, 0.0 },
+	{ 26, 0.0 },
+	{ 26.5, 0.0 },
+	{ 27, 0.0 },
+	{ 27.5, 0.0 },
+	{ 28, 0.0 },
+	{ 28.5, 0.0 },
+	{ 29, 0.0 },
+	{ 29.5, 0.0 },
+	{ 30, 0.0 },
+	{ 30.5, 0.0 },
+	{ 31, 0.0 },
+	{ 31.5, 0.0 },
+	{ 32, 0.0 },
+	{ 32.5, 0.0 },
+	{ 33, 0.0 },
+	{ 33.5, 0.0 },
+	{ 34, 0.0 },
+	{ 34.5, 0.0 },
+	{ 35, 0.0 },
+	{ 35.5, 0.0 },
+	{ 36, 0.0 },
+	{ 36.5, 0.0 },
+	{ 37, 0.0 },
+	{ 37.5, 0.0 },
+	{ 38, 0.0 },
+	{ 38.5, 0.0 },
+	{ 39, 0.0 },
+	{ 39.5, 0.0 },
+	{ 40, 0.0 },
+	{ 40.5, 0.0 },
+	{ 41, 0.0 },
+	{ 41.5, 0.0 },
+	{ 42, 0.0 },
+	{ 42.5, 0.0 },
+	{ 43, 0.0 },
+	{ 43.5, 0.0 },
+	{ 44, 0.0 },
+	{ 44.5, 0.0 },
+	{ 45, 0.0 },
+	{ 45.5, 0.0 },
+	{ 46, 0.0 },
+	{ 46.5, 0.0 },
+	{ 47, 0.0 },
+	{ 47.5, 0.0 },
+	{ 48, 0.0 },
+	{ 48.5, 0.0 },
+	{ 49, 0.0 },
+	{ 49.5, 0.0 },
+	{ 50, 0.0 },
+	{ 50.5, 0.0 },
+	{ 51, 0.0 },
+	{ 51.5, 0.0 },
+	{ -1.0, -1.0 }
+};
+
+
+
+
+
+// x,y coords (m,m) of ball flight. The sequence terminates with 'dataEnd' if fewer than maxDataPoints used.
 
 //************************************* MAIN ***********************************************************************
 int main(void)
@@ -476,16 +592,30 @@ void generateFlightPath(float speed, float angle)
 	int i(0);
 	for (; i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight); ++i)	// If height goes negative or too high, STOP!
 	{
-		flightPath[i][x] = xValue;	// store data points
+
 		flightPath[i][y] = yValue;
 		xValue += deltaD;			// do for each increment tick across the pitch
+
 
 		// find the 'y' (height) for each 'x' distance using the angle and speed previously found (same equation as above)
 		yValue = (xValueSquaredTimesGravity[i] * inverseOfCos) + (xValue * tanAngleRads);
 	}
 	// Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)
-	flightPath[i][x] = dataEnd;
-	flightPath[i][y] = dataEnd;
+
+	//asm volatile (
+	//	"	addi 10, 0x0, 0x0 									\n" // Putting 0 into r10 - for the loop counter
+	//	"										\n" //	
+	//	"	loop:									\n" // 
+	//	"										\n" // 
+	//	"										\n" //
+	//	"										\n" //  
+
+	//
+	//	:									// output list
+	//	:									// input list
+	//	:									// clobber list
+
+	//	); // end of inline ASM
 }
 
 //************************************ Supporting functions *******************************************************
