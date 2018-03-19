@@ -603,20 +603,29 @@ void generateFlightPath(float speed, float angle)
 	 /*Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)*/
 
 	asm volatile (
-		"	la	6,%[xVal]										\n" //	load address of xValue into r 6
-		"	la	7,%[xVal]										\n" //	load address of yValue into r 7
-		"	mr	18,%[maxPts]									\n" //	move 104 into r 18
+		"	la	5,%[xVal]					\n" //	load address of xValue into r 6
+		"	la	6,%[yVal]					\n" //	load address of yValue into r 7
+		"	mr	18,%[maxPts]				\n" //	move 104 into r 18
 
-		"mtctr 18												\n" // set the counter to decrementing 104 times
-	"for:														\n" //  
-		"														\n" //	load address of yValue into r 7
-	"endif1:													\n" // 
-		"bc 16,0,for											\n" // 
-		"														\n" //
-		"														\n"	//
-		"														\n" // 
-		"														\n" // 
-		"mtcrf 0x20,103											\n" //
+		"   li  7,%[maxPts]-1               \n" //Loading maxDatapoints into r7
+
+		"mtctr 7						    \n" // set the counter to run r7 times (maxDatapoints)
+	"for:									\n" //  
+		"  cmpd 6, 0x0						\n" // Compare if yValue is greater than    =    R6(yVal) > 0.0
+		"  ble endif                        \n" //If compare is faulse then go straight to endif
+		"  la 8, %[yVal]-1                  \n"                 
+		"  cmpd maxHe, 8                    \n" // Check if MaxHeight > yValue-1
+		"  ble endif                        \n" // If compare is faulse then go straight to endif
+		"									\n"
+		"									\n" //Flightpath = yvalue
+		" fadd 5,5, 						\n" //xValue increment by deltaD
+		"									\n" //yValue formula
+	"endif:									\n" // 
+		"bc 16,0,for						\n" // 
+		"									\n" //
+		"									\n"	//
+		"									\n" // 
+		"									\n" // 
 
 		: [xVal] "=m"  (xValue),									// output list
 		  [yVal] "=m" (yValue),
