@@ -600,22 +600,25 @@ void generateFlightPath(float speed, float angle)
 		// find the 'y' (height) for each 'x' distance using the angle and speed previously found (same equation as above)
 		yValue = (xValueSquaredTimesGravity[i] * inverseOfCos) + (xValue * tanAngleRads);
 	}
-	// Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)
+	 /*Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)*/
 
-	//asm volatile (
-	//	"	addi 10, 0x0, 0x0 									\n" // Putting 0 into r10 - for the loop counter
-	//	"										\n" //	
-	//	"	loop:									\n" // 
-	//	"										\n" // 
-	//	"										\n" //
-	//	"										\n" //  
+	asm volatile (
+		"	addi 10, 0x0, 0x0 									\n" // Putting 0 into r10 - for the loop counter
+		"										\n" //	
+		"	loop:									\n" // 
+		"										\n" // 
+		"										\n" //
+		"										\n" //  
 
-	//
-	//	:									// output list
-	//	:									// input list
-	//	:									// clobber list
+	
+		: [xVal] "=m"  (xValue),									// output list
+		  [yVal] "=m" (yValue)
+ 		: [maxPts] "i" (maxDataPoints),	   // input list
+		  [yVal] "i" (yValue),
+		  [MaxHe] "i" (maxHeight)
+		: "r10", "r11"									// clobber list
 
-	//	); // end of inline ASM
+		); // end of inline ASM
 }
 
 //************************************ Supporting functions *******************************************************
