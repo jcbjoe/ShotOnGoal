@@ -603,20 +603,31 @@ void generateFlightPath(float speed, float angle)
 	 /*Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)*/
 
 	asm volatile (
-		"	addi 10, 0x0, 0x0 									\n" // Putting 0 into r10 - for the loop counter
-		"										\n" //	
-		"	loop:									\n" // 
-		"										\n" // 
-		"										\n" //
-		"										\n" //  
+		"	la	6,%[xVal]										\n" //	load address of xValue into r 6
+		"	la	7,%[xVal]										\n" //	load address of yValue into r 7
+		"	mr	18,%[maxPts]									\n" //	move 104 into r 18
 
-	
+		"mtctr 18												\n" // set the counter to decrementing 104 times
+	"for:														\n" //  
+		"														\n" //	load address of yValue into r 7
+	"endif1:													\n" // 
+		"bc 16,0,for											\n" // 
+		"														\n" //
+		"														\n"	//
+		"														\n" // 
+		"														\n" // 
+		"mtcrf 0x20,103											\n" //
+
 		: [xVal] "=m"  (xValue),									// output list
-		  [yVal] "=m" (yValue)
+		  [yVal] "=m" (yValue),
+		  [tAR] "=m"[tanAngleRads],
+		  [iCos] "=m"[inverseOfCos]
+
  		: [maxPts] "i" (maxDataPoints),	   // input list
 		  [yVal] "i" (yValue),
 		  [MaxHe] "i" (maxHeight)
-		: "r10", "r11"									// clobber list
+		 
+		: "r10", "r11", "fr6", "fr7", "r8" ,									// clobber list
 
 		); // end of inline ASM
 }
