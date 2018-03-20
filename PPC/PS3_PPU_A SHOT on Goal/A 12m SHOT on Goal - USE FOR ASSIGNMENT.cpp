@@ -580,7 +580,7 @@ void generateFlightPath(float speed, float angle)
 	//  ...reminders...
 	//const float deltaD (0.5F)
 	//const int maxDataPoints = 104
-	//const float maxHeight(8.5F);	// (m) trajectories above this height can't be displayed (out the park!)
+	const float maxHeight(8.5F);	// (m) trajectories above this height can't be displayed (out the park!)
 
 	float yValue(0.001F);	// ball is sitting on a tee just above the ground begin with, of course!
 	float xValue(0.0F);		// ...and hasn't moved yet.
@@ -605,23 +605,21 @@ void generateFlightPath(float speed, float angle)
 	asm volatile (
 		"	la	5,%[xVal]					\n" //	load address of xValue into r 6
 		"	la	6,%[yVal]					\n" //	load address of yValue into r 7
-		"	mr	18,%[maxPts]				\n" //	move 104 into r 18
-
-		"   li  7,%[maxPts]-1               \n" //Loading maxDatapoints into r7
-
-		"mtctr 7						    \n" // set the counter to run r7 times (maxDatapoints)
+		"   li  7,%[maxPts]-1               \n" //	Loading maxDatapoints into r7
+		"	lfs	5,%[delD]					\n" //	load Delta D into fr5
+		"									\n" //	Flightpath = yvalue
+		"	mtctr 7						    \n" //	set the counter to run r7 times (maxDatapoints)104
 	"for:									\n" //  
-		"  cmpd 6, 0x0						\n" // Compare if yValue is greater than    =    R6(yVal) > 0.0
-		"  ble endif                        \n" //If compare is faulse then go straight to endif
+		"  cmpd 6, 0x0						\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0
+		"  ble endif                        \n" //	If compare is faulse then go straight to endif
 		"  la 8, %[yVal]-1                  \n"                 
 		"  cmpd maxHe, 8                    \n" // Check if MaxHeight > yValue-1
-		"  ble endif                        \n" // If compare is faulse then go straight to endif
+		"  ble endif                        \n" // If compare is false then go straight to endif
 		"									\n"
 		"									\n" //Flightpath = yvalue
-		" fadd 5,5, 						\n" //xValue increment by deltaD
-		"									\n" //yValue formula
+		"  fadd 5,%[deld]					\n" //yValue formula
 	"endif:									\n" // 
-		"bc 16,0,for						\n" // 
+		"  bc 16,0,for						\n" // 
 		"									\n" //
 		"									\n"	//
 		"									\n" // 
@@ -634,9 +632,10 @@ void generateFlightPath(float speed, float angle)
 
  		: [maxPts] "i" (maxDataPoints),	   // input list
 		  [yVal] "i" (yValue),
-		  [MaxHe] "i" (maxHeight)
+		  [MaxHe] "i" (maxHeight),
+		  [delD] "f" (deltaD)
 		 
-		: "r10", "r11", "fr6", "fr7", "r8" ,									// clobber list
+		: "r10", "r11", "r6", "r7", "r8" , "fr5", "CTR", "CC"									// clobber list
 
 		); // end of inline ASM
 }
