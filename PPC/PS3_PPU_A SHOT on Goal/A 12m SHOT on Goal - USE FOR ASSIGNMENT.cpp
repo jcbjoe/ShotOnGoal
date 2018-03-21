@@ -603,39 +603,47 @@ void generateFlightPath(float speed, float angle)
 	 /*Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)*/
 
 	asm volatile (
-		"	la	5,%[xVal]					\n" //	load address of xValue into r 6
-		"	la	6,%[yVal]					\n" //	load address of yValue into r 7
-		"   li  7,%[maxPts]-1               \n" //	Loading maxDatapoints into r7
-		"	lfs	5,%[delD]					\n" //	load Delta D into fr5
+		"   la   5,%[flightPa]                \n"
+		"	lfs	 6,%[xVal]					\n" //	Load XVal Height into register 6 
+		"	lfs	 7,%[yVal]					\n" //	Load YVal Height into register 7 
+		"   li   8,%[maxPts]-1               \n" //	Load MaxPoints Height into register 8 
+		"   lfs  9,%[MaxHe]                  \n" //  Load Max Height into register 9 
+		"	lfs	 10,%[delD]					\n" //	Load DeltaD into register 10
+		"   la   11, %[xValSquared]           \n"
 		"									\n" //	Flightpath = yvalue
-		"	mtctr 7						    \n" //	set the counter to run r7 times (maxDatapoints)104
-	"for:									\n" //  
-		"  cmpd 6, 0x0						\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0
+		"  mtctr 8						    \n" //	set the counter to run r8 times (maxpoints)
+	"for:  lwzu  8, 0x4(5)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path
+		"  lwzu  8, 0x4(5)                   \n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity
+		"  cmpd  7, 0x0						\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0
 		"  ble endif                        \n" //	If compare is faulse then go straight to endif
-		"  la 8, %[yVal]-1                  \n"                 
-		"  cmpd maxHe, 8                    \n" // Check if MaxHeight > yValue-1
+		"                                   \n"
+		"  lfs   15, %[yVal]-1                \n" // Load yVal value - 1(So its equal to) into register                 
+		"  cmpd maxHe, 15                   \n" // Check if MaxHeight > yValue-1
 		"  ble endif                        \n" // If compare is false then go straight to endif
-		"									\n"
-		"									\n" //Flightpath = yvalue
-		"  fadd 5,%[deld]					\n" //yValue formula
+		"									\n"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \n" // FligtPath current  = yVal
+		"  fadd  6,6,10						\n" //Increment XVal
+		"  fmul  7, %[xValSquared], %[invCos]\n" // Multiply  (xValueSquaredTimesGravity[i] * inverseOfCos) First 
+		"  fadd  7, %[xVal], %[tanAngRad]    \n" // Then add (xValue * tanAngleRads) Nexy
 	"endif:									\n" // 
-		"  bc 16,0,for						\n" // 
+		"  bc 16,0,for						\n" // Check if the CTR - 16 reg is 0 If not REPEAT
 		"									\n" //
 		"									\n"	//
 		"									\n" // 
 		"									\n" // 
 
-		: [xVal] "=m"  (xValue),									// output list
-		  [yVal] "=m" (yValue),
-		  [tAR] "=m"[tanAngleRads],
-		  [iCos] "=m"[inverseOfCos]
+		: [flightPa] "=m" (flightPath) //Output List
 
- 		: [maxPts] "i" (maxDataPoints),	   // input list
-		  [yVal] "i" (yValue),
-		  [MaxHe] "i" (maxHeight),
-		  [delD] "f" (deltaD)
+ 		: [flightPa] "=m" (flightPath[0][1]),
+		  [xVal] "m" (xValue),
+		  [yVal] "m" (yValue),
+		  [maxPts] "i" (maxDataPoints),	   // input list
+		  [MaxHe] "m" (maxHeight),
+		  [delD] "m" (deltaD),
+		  [xValSquared] "m" (xValueSquaredTimesGravity[0]),
+		  [invCos] "m" (inverseOfCos),
+		  [tanAngRad] "m" (tanAngleRads)
 		 
-		: "r10", "r11", "r6", "r7", "r8" , "fr5", "CTR", "CC"									// clobber list
+		: "fr5", "fr6", "fr7", "r8", "fr9", "fr10", "CTR", "CC" // clobber list
 
 		); // end of inline ASM
 }
