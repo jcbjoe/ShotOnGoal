@@ -326,7 +326,8 @@ const float deltaY(0.25F);			// (m) increment in the height direction (vertical 
 const float yScale = 1.0F / deltaY;	// vertical scaling factor
 const float xScale = 1.0F / deltaD;	// horizontal scaling factor
 
-const int maxDataPoints = (int)((maxDistanceToGoal + 2.0F) / deltaD);	// =104, calculate a data point for each 0.5 metre along
+//int maxDataPoints = (int)((maxDistanceToGoal + 2.0F) / deltaD);	// =104, calculate a data point for each 0.5 metre along
+const int maxDataPoints = 104;
 // +2.0 so that ball appears beyond the goal at maxDistance
 
 float flightPath[104 + 1][2] = 
@@ -577,10 +578,7 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 // With metrics found, calculate the flight path coords. Uses 'flightPath[104][2]' array as global.
 void generateFlightPath(float speed, float angle)
 {
-	//  ...reminders...
-	//const float deltaD (0.5F)
-	//const int maxDataPoints = 104
-	const float maxHeight(8.5F);	// (m) trajectories above this height can't be displayed (out the park!)
+	//  ...reminders..
 
 	float yValue(0.001F);	// ball is sitting on a tee just above the ground begin with, of course!
 	float xValue(0.0F);		// ...and hasn't moved yet.
@@ -590,6 +588,7 @@ void generateFlightPath(float speed, float angle)
 
 
 	int i(0);
+
 	for (; i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight); ++i)	// If height goes negative or too high, STOP!
 	{
 
@@ -602,50 +601,46 @@ void generateFlightPath(float speed, float angle)
 	}
 	 /*Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)*/
 
-	asm volatile (
-		"   la   5,%[flightPa]                \n"
-		"	lfs	 6,%[xVal]					\n" //	Load XVal Height into register 6 
-		"	lfs	 7,%[yVal]					\n" //	Load YVal Height into register 7 
-		"   li   8,%[maxPts]-1               \n" //	Load MaxPoints Height into register 8 
-		"   lfs  9,%[MaxHe]                  \n" //  Load Max Height into register 9 
-		"	lfs	 10,%[delD]					\n" //	Load DeltaD into register 10
-		"   la   11, %[xValSquared]           \n"
-		"									\n" //	Flightpath = yvalue
-		"  mtctr 8						    \n" //	set the counter to run r8 times (maxpoints)
-	"for:  lwzu  8, 0x4(5)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path
-		"  lwzu  8, 0x4(5)                   \n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity
-		"  cmpd  7, 0x0						\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0
-		"  ble endif                        \n" //	If compare is faulse then go straight to endif
-		"                                   \n"
-		"  lfs   15, %[yVal]-1                \n" // Load yVal value - 1(So its equal to) into register                 
-		"  cmpd maxHe, 15                   \n" // Check if MaxHeight > yValue-1
-		"  ble endif                        \n" // If compare is false then go straight to endif
-		"									\n"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     \n" // FligtPath current  = yVal
-		"  fadd  6,6,10						\n" //Increment XVal
-		"  fmul  7, %[xValSquared], %[invCos]\n" // Multiply  (xValueSquaredTimesGravity[i] * inverseOfCos) First 
-		"  fadd  7, %[xVal], %[tanAngRad]    \n" // Then add (xValue * tanAngleRads) Nexy
-	"endif:									\n" // 
-		"  bc 16,0,for						\n" // Check if the CTR - 16 reg is 0 If not REPEAT
-		"									\n" //
-		"									\n"	//
-		"									\n" // 
-		"									\n" // 
+	//asm volatile (
+	//	"   lfs   5,%[flightPa]                \n"
+	//	"	lfs	 6,%[xVal]					\n" //	Load XVal Height into register 6 
+	//	"	lfs	 7,%[yVal]					\n" //	Load YVal Height into register 7 
+	//	"   li   8,%[maxPts]-1               \n" //	Load MaxPoints Height into register 8 
+	//	"   lfs  9,%[MaxHe]                  \n" //  Load Max Height into register 9 
+	//	"	lfs	 10,%[delD]					\n" //	Load DeltaD into register 10
+	//	"   la   11, %[xValSquared]           \n"
 
-		: [flightPa] "=m" (flightPath) //Output List
+	//	"  mtctr 8						    \n" //	set the counter to run r8 times (maxpoints)
+	//"for:  lwzu  8, 0x8(5)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path
+	//	"  lwzu  8, 0x4(11)                   \n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity
+	//	"  cmpd  7, 0x0						\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0
+	//	"  ble endif                        \n" //	If compare is faulse then go straight to endif
 
- 		: [flightPa] "=m" (flightPath[0][1]),
-		  [xVal] "m" (xValue),
-		  [yVal] "m" (yValue),
-		  [maxPts] "i" (maxDataPoints),	   // input list
-		  [MaxHe] "m" (maxHeight),
-		  [delD] "m" (deltaD),
-		  [xValSquared] "m" (xValueSquaredTimesGravity[0]),
-		  [invCos] "m" (inverseOfCos),
-		  [tanAngRad] "m" (tanAngleRads)
-		 
-		: "fr5", "fr6", "fr7", "r8", "fr9", "fr10", "CTR", "CC" // clobber list
+	//	"  lfs   15, %[yVal]-1                \n" // Load yVal value - 1(So its equal to) into register                 
+	//	"  cmpd maxHe, 15                   \n" // Check if MaxHeight > yValue-1
+	//	"  ble endif                        \n" // If compare is false then go straight to endif
 
-		); // end of inline ASM
+	//	"  fadd  6,6,10						\n" //Increment XVal
+	//	"  fmul  7, %[xValSquared], %[invCos] \n" // Multiply  (xValueSquaredTimesGravity[i] * inverseOfCos) First 
+	//	"  fadd  7, %[xVal], %[tanAngRad]    \n" // Then add (xValue * tanAngleRads) Nexy
+	//"endif:									\n" // 
+	//	"  bc 16,0,for						\n" // Check if the CTR - 16 reg is 0 If not REPEAT
+
+	//	: 
+	//	  
+ //		: 
+	//	  [flightPa] "m" (flightPath[0][1])
+	//	  [xVal] "m" (xValue),
+	//	  [yVal] "m" (yValue),
+	//	  [maxPts] "m" (maxDataPoints),	   // input list
+	//	  [MaxHe] "m" (maxHeight),
+	//	  [delD] "m" (deltaD),
+	//	  [xValSquared] "m" (xValueSquaredTimesGravity[0]),
+	//	  [invCos] "m" (inverseOfCos),
+	//	  [tanAngRad] "m" (tanAngleRads)
+	//	: "fr5", "fr6", "fr7", "r8", "fr9", "fr10", "ctr", "cc" // clobber list
+
+	//	); // end of inline ASM
 }
 
 //************************************ Supporting functions *******************************************************
