@@ -326,7 +326,8 @@ float deltaY(0.25F);			// (m) increment in the height direction (vertical exagge
 float yScale = 1.0F / deltaY;	// vertical scaling factor
 float xScale = 1.0F / deltaD;	// horizontal scaling factor
 
-const int maxDataPoints = (int)((maxDistanceToGoal + 2.0F) / deltaD);	// =104, calculate a data point for each 0.5 metre along
+// int maxDataPoints = (int)((maxDistanceToGoal + 2.0F) / deltaD);	// =104, calculate a data point for each 0.5 metre along
+const int maxDataPoints(104);
 // +2.0 so that ball appears beyond the goal at maxDistance
 
 float flightPath[104 + 1][2] =
@@ -655,30 +656,33 @@ void generateFlightPath(float speed, float angle)
 		"	lfs	 13,%[tanAngRad]				\n" //
 
 		"  mtctr 8							    \n" //	set the counter to run r8 times (maxpoints)			COMPILED
-		"for: lwzu  8, 0x8(5)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path						COMPILED
-		"  lwzu  8, 0x8(5)						\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity			COMPILED
-		"  cmpd  0, 0x0							\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0													COMPILED
+		"for:                            		\n" 
+		
+		"  cmpd  7, 0x0							\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0													COMPILED
 		"  ble endif							\n" //	If compare is faulse then go straight to endif		COMPILED
 
 		"  lfs   14,%[yVal]						\n" // Load yVal value - 1(So its equal to) into register    //DOES NOT COMPILE WITH THE MINUS 1 "error : junk at end of line: `-1'" 
 		"  fsub 14,0, 0x1						\n" // deleting 1 from 14 (maybe>?"!?!?!"?!"?!"?)
 
-		"  cmpd  0, 9, 14						\n" // Check if MaxHeight > yValue-1					//DOES NOT COMPILE "error : unsupported relocation against maxHe" Changed it to r9
+		"  cmpd  9, 14						\n" // Check if MaxHeight > yValue-1					//DOES NOT COMPILE "error : unsupported relocation against maxHe" Changed it to r9
 		"  ble endif							\n" // If compare is false then go straight to endif         COMPILED                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   \n" // FligtPath current  = yVal
-		"  fadd  6,6,10							\n" // Increment XVal
+		"  fadd  6,6,10							\n" // Increment XVal (DelD)
 		"  fmul  7, 11, 12						\n" // Multiply  (xValueSquaredTimesGravity[i] * inverseOfCos) First 
 		"  fadd  7, 6, 13						\n" // Then add (xValue * tanAngleRads) Nexy
+		"  stfs  7, %[flightPa]					\n" //
+		"  lwzu  15, 0x8(5)                     \n"//  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path						COMPILED
+		"  lwzu  16, 0x4(11)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity			COMPILED
 		"endif:									\n" // 
 		"  bc 16,0,for							\n" // Check if the CTR - 16 reg is 0 If not REPEAT
 
 
 
 
-
-		: [flightPa]"=m" (flightPath[0][1])		//Output List
-		: [xVal] "m" (xValue),					// input list
+		:
+	    :[flightPa]"m" (flightPath[0][1]),	//Output List
+	    [xVal] "m" (xValue),					// input list
 		[yVal] "m" (yValue),
-		[maxPts] "r" (maxDataPoints),
+		[maxPts] "i" (maxDataPoints),
 		[MaxHe] "m" (maxHeight),
 		[delD] "m" (deltaD),
 		[xValSquared] "m" (xValueSquaredTimesGravity[0]),
@@ -688,7 +692,7 @@ void generateFlightPath(float speed, float angle)
 
 
 
-		: "fr5", "fr6", "fr7", "r8", "fr9", "fr10", "fr11", "fr12", "fr13", "fr14", "ctr"
+		: "fr5", "fr6", "fr7", "r8", "fr9", "fr10", "fr11", "fr12", "fr13", "fr14", "fr15", "fr16" , "ctr"
 
 		); // end of inline ASM
 };
