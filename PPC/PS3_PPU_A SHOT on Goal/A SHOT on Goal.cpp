@@ -90,7 +90,7 @@ const float maxSpeed(32.0F);	// (m/s) who let Superman on the pitch!? Research i
 float maxHeight(8.5F);	// (m)   trajectories above this height can't be displayed (out the park!)
 
 
-const float xValueSquaredTimesGravity[104] = {
+float xValueSquaredTimesGravity[104] = {
 	-2.4525,
 	-9.81,
 	-22.0725,
@@ -621,10 +621,12 @@ void generateFlightPath(float speed, float angle)
 		//"										\n"
 		//"  lfs   15, %[yVal]-1					\n" // Load yVal value - 1(So its equal to) into register                 
 		//"  cmpd maxHe, 15						\n" // Check if M	\n" //	Compare if yVaaxHeight > yValue-1
-		//"  ble endif							\n" // If compare is false then go straight to endif                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \n" // FligtPath current  = yVal
+		//"  ble endif							\n" // If compare is false then go straight to endif                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 		//"  fadd  6,6,10							\n" //Increment XVal
 		//"  fmul  7, %[xValSquared], %[invCos]	\n" // Multiply  (xValueSquaredTimesGravity[i] * inverseOfCos) First 
-		//"  fadd  7, %[xVal], %[tanAngRad]		\n" // Then add (xValue * tanAngleRads) Nexy
+		//"  fmul  15, %[xVal], %[tanAngRad]	\n" // Multiply  (xValueSquaredTimesGravity[i] * inverseOfCos) First 
+
+		//"  fadd  13, %[xVal], %[tanAngRad]		\n" // Then add (xValue * tanAngleRads) Nexy
 		//"endif:										\n" // 
 		//"  bc 16,0,for							\n" // Check if the CTR - 16 reg is 0 If not REPEAT
 
@@ -648,30 +650,36 @@ void generateFlightPath(float speed, float angle)
 		"   la   5,%[flightPa]				    \n" //  Load flightpath into register 5						COMPLILED
 		"	lfs	 6,%[xVal]						\n" //	Load XVal Height into register 6					COMPLILED
 		"	lfs	 7,%[yVal]						\n" //	Load YVal Height into register 7					COMPLILED
-		"   li   8,%[maxPts]-1				    \n" //	Load MaxPoints Height into register 8				COMPLILED
-		"   lfs  9,%[MaxHe]					    \n" //  Load Max Height into register 9						COMPILED HAD TO REMOVE CONST FROM MAX HEIGHTS!?
-		"	lfs	 10,%[delD]						\n" //	Load DeltaD into register 10						COMPILED
-		"	la   11,%[xValSquared]				\n" //	Flightpath = yvalue									COMPILED
-		"	lfs	 12,%[invCos]					\n" //
-		"	lfs	 13,%[tanAngRad]				\n" //
+		"   li   8,%[maxPts]				    \n" //	Load MaxPoints Height into register 8				COMPLILED
+		"	la   13,%[xValSquared]				\n" //	Flightpath = yvalue									COMPILED
 
-		"  mtctr 8							    \n" //	set the counter to run r8 times (maxpoints)			COMPILED
+		"  mtctr 8					\n" //	set the counter to run r8 times (maxpoints)			COMPILED
 		"for:                            		\n" 
 		
 		"  cmpd  7, 0x0							\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0													COMPILED
 		"  ble endif							\n" //	If compare is faulse then go straight to endif		COMPILED
 
-		"  lfs   14,%[yVal]						\n" // Load yVal value - 1(So its equal to) into register    //DOES NOT COMPILE WITH THE MINUS 1 "error : junk at end of line: `-1'" 
-		"  fsub 14,0, 0x1						\n" // deleting 1 from 14 (maybe>?"!?!?!"?!"?!"?)
+		"  lfs  9,%[MaxHe]					    \n" //  Load Max Height into register 9						COMPILED HAD TO REMOVE CONST FROM MAX HEIGHTS!?
+		"  cmpd  9, 7						\n" // Check if MaxHeight > yValue-1					//DOES NOT COMPILE "error : unsupported relocation against maxHe" Changed it to r9
+		"  bge endif							\n" // If compare is false then go straight to endif         COMPILED       
 
-		"  cmpd  9, 14						\n" // Check if MaxHeight > yValue-1					//DOES NOT COMPILE "error : unsupported relocation against maxHe" Changed it to r9
-		"  ble endif							\n" // If compare is false then go straight to endif         COMPILED                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   \n" // FligtPath current  = yVal
-		"  fadd  6,6,10							\n" // Increment XVal (DelD)
-		"  fmul  7, 11, 12						\n" // Multiply  (xValueSquaredTimesGravity[i] * inverseOfCos) First 
-		"  fadd  7, 6, 13						\n" // Then add (xValue * tanAngleRads) Nexy
-		"  stfs  7, %[flightPa]					\n" //
-		"  lwzu  15, 0x8(5)                     \n"//  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path						COMPILED
-		"  lwzu  16, 0x4(11)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity			COMPILED
+		"  stfs  7, 0x0(5)				        \n" //
+
+		"  lfs  8,%[delD]				    \n" //	load delta time
+		"  fadd 6, 6,8                       \n" // add deltaD
+		
+		"  lfs   9,%[invCos]				    \n" //	invcos load in
+		"  lfs 12,0x0(13)                      \n"
+		"  fmul 8, 12, 9                         \n " //xValueSquaredTimesGravity[i] * inverseOfCos
+
+		"  lfs   9,%[tanAngRad]				    \n" //	tangle load in
+		"  fmul   9, 6,9                         \n" //xValue * tanAngleRads
+
+		"  fadd 7, 9, 8                        \n" //(xValueSquaredTimesGravity[i] * inverseOfCos) + (xValue * tanAngleRads)
+		
+		
+		"  lwzu  9, 0x8(5)                     \n"//  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path						COMPILED
+		"  lwzu  8, 0x4(13)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity			COMPILED
 		"endif:									\n" // 
 		"  bc 16,0,for							\n" // Check if the CTR - 16 reg is 0 If not REPEAT
 
@@ -692,7 +700,7 @@ void generateFlightPath(float speed, float angle)
 
 
 
-		: "fr5", "fr6", "fr7", "r8", "fr9", "fr10", "fr11", "fr12", "fr13", "fr14", "fr15", "fr16" , "ctr"
+		: "fr5", "fr6", "fr7", "fr8", "r8", "fr9", "fr10", "fr11", "fr12", "fr13", "fr14", "fr15", "fr16" , "ctr"
 
 		); // end of inline ASM
 };
