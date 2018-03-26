@@ -549,66 +549,65 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 
 		
 		"  li  15, 0x0                           \n" // AngleCounter
-		"  lfs 27, %[delD]                  \n" // load in delta time
+		"  lfs 27, %[delD]                       \n" // load in delta time
 		
-		"  la 19, %[tanAngleRad]                \n" //load in angleRads
-		"  la 20, %[cosX2Inv]                   \n" // load in cosX2inverse
-		"  lfs   14,%[minAng]                     \n" // Next Angle
-		"while:                            		\n" // Main while loop
+		"  la 19, %[tanAngleRad]                 \n" //load in angleRads
+		"  la 20, %[cosX2Inv]                    \n" // load in cosX2inverse
+		"  lfs   14,%[minAng]                    \n" // Next Angle
+		"while:                            		 \n" // Main while loop
 
 
 		"  lfs   16,%[maxAng]                    \n" // Max Angle
-		"  fcmpu 0, 14, 16                        \n" // Compare nextAngle and MaxAngle
-		"  bgt endWhile                         \n" // branch greater than - Exit while loop
+		"  fcmpu 0, 14, 16                       \n" // Compare nextAngle and MaxAngle
+		"  bgt endWhile                          \n" // branch greater than - Exit while loop
 
 		
-		"  la 21, %[speedArray]                 \n" //Speed array
+		"  la 21, %[speedArray]                  \n" //Speed array
 		
 
-		"  lfs 18, %[minSped]                   \n" // Next Speed - 
+		"  lfs 18, %[minSped]                    \n" // Next Speed
 
-		//float XTimesTanAngleRads(x * tanAngleRads);
-		"  lfs 19,0x0(19)                      \n" // tanAngleRads float - tanAngleRads
+		"  lfs 19,0x0(19)                        \n" // tanAngleRads float - tanAngleRads
 
-		"  lfs 24, %[xVal]                    \n" // Load in X
-		"  fmul 25, 24, 19                     \n" // x * tanAngleRads - XTimesTanAngleRads
+		"  lfs 24, %[xVal]                       \n" // Load in X
+		"  fmul 25, 24, 19                       \n" // x * tanAngleRads - XTimesTanAngleRads
 
 		"  li   17, 0x0                          \n" //Speed Counter
 
 		"  do:                                   \n"
-		"     lfs 21,0x0(21)                      \n" // speedArray float
+		"     lfs 21,0x0(21)                     \n" // speedArray float
 
 		"     lfs 22, %[gravTimX]                \n" // load in gravity Times X
 		"     lfs 20,0x0(20)                     \n" // (cosX2Inverse[angleCounter] float
 		"     fmul 23, 20, 22                    \n" // (cosX2Inverse[angleCounter] * gravityTimesX - InverseTwoTimesSquareOfCosAngleRadTimesGravity
 
-		"     fmul 23, 21, 23                     \n" // speeds[speedCounter] * (cosX2Inverse[angleCounter] * gravityTimesX) 
+		"     fmul 23, 21, 23                    \n" // speeds[speedCounter] * (cosX2Inverse[angleCounter] * gravityTimesX) 
 		"     fadd 23, 23, 25                    \n" //  ^^ + XTimesTanAngleRads
 
 		"     lfs 26, %[crossMarg]               \n" // Load in The crossbar Margin
 		"     fcmpu 0, 26, 23                    \n" // Compare height(InversenextSpeedSquared * InverseTwoTimesSquareOfCosAngleRadTimesGravity + XTimesTanAngleRads) With Crossbar margin
 		"     bgt else                           \n" // branch if greater than to the else
 		"     stfs 18, %[speedP]                 \n" // store next speed in the speed pointer - probably wont work
-		"     stfs 14, %[angleP]                  \n" // store next angle in the angle pointer - probably wont work
+		"     stfs 14, %[angleP]                 \n" // store next angle in the angle pointer - probably wont work
 		"     stw 15, %[angSel]                  \n" // store the angle counter in the selected angle global 
 		"     stw 17, %[spedSel]                 \n" // store the speed counter in the selected speed global
 		"     b endWhile                         \n" // branch to end of loop - found solution
 		"     else:                              \n" // else condition - if the other wasnt true
 		"       fadd 18, 18, 27                  \n" // increment next speed by deltaD
 		"     after:                             \n" // To be ran after the conditional statments
-		"       addi 17, 17, 0x1                   \n" // increment speed counter
+		"       addi 17, 17, 0x1                 \n" // increment speed counter
 
-		"      lwzu  30, 0x4(21)                  \n" // update the speed array to next part
+		"      lwzu  30, 0x4(21)                 \n" // update the speed array to next part
 
 		"      lfs   28, %[maxSped]              \n" // load in max speed
-		"      fcmpu 0, 18, 28                     \n" // compare next speed and max speed 
+		"      fcmpu 0, 18, 28                   \n" // compare next speed and max speed 
 		"      bgt   endDo                       \n" // if nextSpeed > maxSpeed then go to end of do loop
 		"      b do                              \n" // ^^^^ else start the do again ^^^^
 		"  endDo:                                \n" // Once the do is finished
-		"    addi 15, 15, 0x1                      \n" // increment angle counter
-		"    fadd 14, 14, 27                      \n" // add delta d to next Angle
-		"    lwzu  30, 0x4(19)                    \n" // move along tanAnglesValues
-		"    lwzu  30, 0x4(20)                    \n" // cosX2Inverse
+		"    addi 15, 15, 0x1                    \n" // increment angle counter
+		"    fadd 14, 14, 27                     \n" // add delta d to next Angle
+		"    lwzu  30, 0x4(19)                   \n" // move along tanAnglesValues
+		"    lwzu  30, 0x4(20)                   \n" // cosX2Inverse
 		"    b while                             \n" // go back to beginning of while loop
 
 		"endWhile:								 \n" // part of end of program
@@ -718,39 +717,39 @@ void generateFlightPath(float speed, float angle)
 	asm volatile (
 
 
-		"   la  14,%[flightPa]				    \n" //  Load flightpath into register 5						COMPLILED
-		"	lfs	 15,%[xVal]						\n" //	Load XVal Height into register 6					COMPLILED
-		"	lfs	 16,%[yVal]						\n" //	Load YVal Height into register 7					COMPLILED
-		"   li   17,%[maxPts]				    \n" //	Load MaxPoints Height into register 8				COMPLILED
-		"	la   18,%[xValSquared]				\n" //	Flightpath = yvalue									COMPILED
+		"   la  14,%[flightPa]				    \n" //  Load flightpath into register 5						
+		"	lfs	 15,%[xVal]						\n" //	Load XVal Height into register 6					
+		"	lfs	 16,%[yVal]						\n" //	Load YVal Height into register 7					
+		"   li   17,%[maxPts]				    \n" //	Load MaxPoints Height into register 8				
+		"	la   18,%[xValSquared]				\n" //	Flightpath = yvalue									
 
-		"  mtctr 17					\n" //	set the counter to run r8 times (maxpoints)			COMPILED
+		"  mtctr 17					            \n" //	set the counter to run r8 times (maxpoints)			
 		"for:                            		\n"
-		"  lfs  19, %[zer]	                        \n"
-		"  fcmpu 0, 16, 19							\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0													COMPILED
-		"  ble endif							\n" //	If compare is faulse then go straight to endif		COMPILED
+		"  lfs  19, %[zer]	                    \n" // Load zero into float 19
+		"  fcmpu 0, 16, 19					    \n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0													
+		"  ble endif							\n" //	If compare is faulse then go straight to endif		
 
-		"  lfs  19,%[MaxHe]					    \n" //  Load Max Height into register 9						COMPILED HAD TO REMOVE CONST FROM MAX HEIGHTS!?
-		"  fcmpu 0, 16, 19						\n" // Check if yValue > MaxHeight				//DOES NOT COMPILE "error : unsupported relocation against maxHe" Changed it to r9
-		"  bgt endif							\n" // If compare is false then go straight to endif         COMPILED       
+		"  lfs  19,%[MaxHe]					    \n" //  Load Max Height into register 9						
+		"  fcmpu 0, 16, 19						\n" // Check if yValue > MaxHeight				
+		"  bgt endif							\n" // If compare is false then go straight to endif            
 
-		"  stfs  16, 0x0(14)				        \n" //
+		"  stfs  16, 0x0(14)				    \n" // get flightPath current address and put it in float
 
-		"  lfs  17,%[delD]				    \n" //	load delta time
+		"  lfs  17,%[delD]				        \n" //	load delta time
 		"  fadd 15, 15,17                       \n" // add deltaD
 
 		"  lfs   19,%[invCos]				    \n" //	invcos load in
-		"  lfs 12,0x0(18)                      \n"
-		"  fmul 17, 12, 19                         \n " //xValueSquaredTimesGravity[i] * inverseOfCos
+		"  lfs 12,0x0(18)                       \n" // Load in Xval address to float val
+		"  fmul 17, 12, 19                      \n " //xValueSquaredTimesGravity[i] * inverseOfCos
 
-		"  lfs   19,%[tanAngRad]				    \n" //	tangle load in
-		"  fmul   19, 15,19                         \n" //xValue * tanAngleRads
+		"  lfs   19,%[tanAngRad]				\n" //	tangle load in
+		"  fmul   19, 15,19                     \n" //xValue * tanAngleRads
 
-		"  fadd 16, 19, 17                        \n" //(xValueSquaredTimesGravity[i] * inverseOfCos) + (xValue * tanAngleRads)
+		"  fadd 16, 19, 17                      \n" //(xValueSquaredTimesGravity[i] * inverseOfCos) + (xValue * tanAngleRads)
 
 
-		"  lwzu  19, 0x8(14)                     \n"//  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path						COMPILED
-		"  lwzu  17, 0x4(18)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity			COMPILED
+		"  lwzu  19, 0x8(14)                    \n"//  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path						
+		"  lwzu  17, 0x4(18)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity		
 		"endif:									\n" // 
 		"  bc 16,0,for							\n" // Check if the CTR - 16 reg is 0 If not REPEAT
 
