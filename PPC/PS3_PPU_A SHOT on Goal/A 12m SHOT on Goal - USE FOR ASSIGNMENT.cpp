@@ -68,7 +68,7 @@ long long GenerateFlightPathTime(1000000);
 const float g(9.81F);					// (m/s/s) gravity
 const float Pi(3.14159265358979323846F);// This value stolen from M_PI defines in Math.h) - used to convert degrees to radians
 const float dataEnd = -1.0F;			// End of data marker
-const int x = 0;						// coordinate system
+int x = 0;						// coordinate system
 const int y = 1;
 #define SPACE ' '
 const double micro(1.0e6F);				// scaling factor to give microseconds
@@ -79,18 +79,18 @@ const double milli(1.0e3F);				// scaling factor to give milliseconds
 //***SHOT const float minAngle(15.0F);	// (deg) pretty low!
 //***SHOT const float maxAngle(45.0F);	// (deg) pretty steep. It becomes increasingly difficult to put enough energy into a ball at angles above 45 deg.
 //***SHOT Limit range of angles to help speed things up, and help elsewhere?
-const float minAngle(18.0F);	// (deg) ***SHOT We know the answer for kick distance 12.0m is 20 degrees.
-const float maxAngle(23.0F);	// (deg)
+ float minAngle(18.0F);	// (deg) ***SHOT We know the answer for kick distance 12.0m is 20 degrees.
+ float maxAngle(23.0F);	// (deg)
 
 int angleSelected;
 int speedSelected;
 
-const float minSpeed(5.0F);		// (m/s) pretty pathetic!
-const float maxSpeed(32.0F);	// (m/s) who let Superman on the pitch!? Research indicates that 26 +/-1.7 m/s is optimal kick speed.
-const float maxHeight(8.5F);	// (m)   trajectories above this height can't be displayed (out the park!)
+ float minSpeed(5.0F);		// (m/s) pretty pathetic!
+ float maxSpeed(32.0F);	// (m/s) who let Superman on the pitch!? Research indicates that 26 +/-1.7 m/s is optimal kick speed.
+ float maxHeight(8.5F);	// (m)   trajectories above this height can't be displayed (out the park!)
 
 
-const float xValueSquaredTimesGravity[104] = {
+ float xValueSquaredTimesGravity[104] = {
 	-2.4525,
 	-9.81,
 	-22.0725,
@@ -196,7 +196,7 @@ const float xValueSquaredTimesGravity[104] = {
 	-26018.6,
 	-26526.2
 };
-const float cosSpeedsinverse[11][55] = {
+ float cosSpeedsinverse[11][55] = {
 	{ 0.0221115, 0.0182739, 0.0153552, 0.0130837, 0.0112814, 0.00982731, 0.00863729, 0.00765102, 0.00682452, 0.00612506, 0.00552786, 0.00501394, 0.00456848, 0.00417986, 0.00383879, 0.00353783, 0.00327093, 0.00303312, 0.00282034, 0.00262919, 0.00245683, 0.00230088, 0.00215932, 0.00203044, 0.00191276, 0.00180502, 0.00170613, 0.00161515, 0.00153126, 0.00145374, 0.00138197, 0.00131538, 0.00125348, 0.00119586, 0.00114212, 0.00109192, 0.00104496, 0.00100097, 0.000959699, 0.000920927, 0.000884458, 0.000850114, 0.000817731, 0.000787165, 0.00075828, 0.000730957, 0.000705085, 0.000680562, 0.000657297, 0.000635204, 0.000614207, 0.000594234, 0.00057522, 0.000557104, 0.00053983 },
 	{ 0.0222391, 0.0183794, 0.0154438, 0.0131592, 0.0113465, 0.00988404, 0.00868714, 0.00769518, 0.00686391, 0.00616041, 0.00555977, 0.00504288, 0.00459485, 0.00420398, 0.00386095, 0.00355825, 0.0032898, 0.00305063, 0.00283662, 0.00264436, 0.00247101, 0.00231416, 0.00217179, 0.00204216, 0.0019238, 0.00181544, 0.00171598, 0.00162448, 0.0015401, 0.00146214, 0.00138994, 0.00132297, 0.00126072, 0.00120276, 0.00114871, 0.00109823, 0.001051, 0.00100675, 0.000965238, 0.000926242, 0.000889563, 0.00085502, 0.000822451, 0.000791708, 0.000762657, 0.000735176, 0.000709154, 0.00068449, 0.00066109, 0.00063887, 0.000617752, 0.000597664, 0.00057854, 0.000560319, 0.000542946 },
 	{ 0.0223712, 0.0184886, 0.0155356, 0.0132374, 0.0114139, 0.00994277, 0.00873876, 0.00774091, 0.0069047, 0.00619702, 0.00559281, 0.00507284, 0.00462216, 0.00422897, 0.00388389, 0.0035794, 0.00330935, 0.00306876, 0.00285347, 0.00266007, 0.00248569, 0.00232791, 0.00218469, 0.00205429, 0.00193523, 0.00182622, 0.00172618, 0.00163413, 0.00154925, 0.00147082, 0.0013982, 0.00133083, 0.00126821, 0.00120991, 0.00115554, 0.00110475, 0.00105724, 0.00101273, 0.000970974, 0.000931746, 0.000894849, 0.000860101, 0.000827338, 0.000796413, 0.000767189, 0.000739545, 0.000713368, 0.000688557, 0.000665019, 0.000642667, 0.000621423, 0.000601216, 0.000581978, 0.000563649, 0.000546173 },
@@ -210,7 +210,7 @@ const float cosSpeedsinverse[11][55] = {
 	{ 0.0236036, 0.0195071, 0.0163914, 0.0139666, 0.0120426, 0.0104905, 0.00922015, 0.00816733, 0.00728505, 0.00653839, 0.00590089, 0.00535228, 0.00487677, 0.00446192, 0.00409784, 0.00377657, 0.00349165, 0.0032378, 0.00301066, 0.00280661, 0.00262262, 0.00245615, 0.00230504, 0.00216745, 0.00204183, 0.00192682, 0.00182126, 0.00172415, 0.0016346, 0.00155185, 0.00147522, 0.00140414, 0.00133807, 0.00127656, 0.00121919, 0.00116561, 0.00111548, 0.00106852, 0.00102446, 0.000983073, 0.000944143, 0.000907481, 0.000872913, 0.000840284, 0.000809451, 0.000780284, 0.000752665, 0.000726487, 0.000701652, 0.000678069, 0.000655655, 0.000634334, 0.000614037, 0.000594698, 0.000576259 }
 };
 
-const float speeds[55] = {
+ float speeds[55] = {
 	0.04,
 	0.0330579,
 	0.0277778,
@@ -268,7 +268,7 @@ const float speeds[55] = {
 	0.000976563
 };
 
-const float cosAnglesValues[10] = {
+ float cosAnglesValues[10] = {
 	0.951057,
 	0.948324,
 	0.945519,
@@ -281,7 +281,7 @@ const float cosAnglesValues[10] = {
 	0.92388
 };
 
-const float cosX2Inverse[10] = {
+ float cosX2Inverse[10] = {
 	0.552786,
 	0.555977,
 	0.559281,
@@ -294,7 +294,7 @@ const float cosX2Inverse[10] = {
 	0.585786
 };
 
-const float tanAnglesValues[10] = {
+ float tanAnglesValues[10] = {
 	0.32492,
 	0.334595,
 	0.344328,
@@ -321,7 +321,7 @@ const float goalPostHeight(7.0F);		// (m) Upto 16m usually. Don't make higher, i
 float distanceToGoal;					// (m) Kicking distance, input by user.
 
 // Final flight path of ball as a series of x,y coordinates
-const float deltaD(0.5F);			// (m) need a coordinate every tick of this distance, plus increment used for speed and angle.
+float deltaD(0.5F);			// (m) need a coordinate every tick of this distance, plus increment used for speed and angle.
 const float deltaY(0.25F);			// (m) increment in the height direction (vertical exaggeration of x2)
 const float yScale = 1.0F / deltaY;	// vertical scaling factor
 const float xScale = 1.0F / deltaD;	// horizontal scaling factor
@@ -537,6 +537,111 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 	int angleCounter(0);
 	float crossbarPlusMargin = crossBarHeight + margin;
 
+
+	//float speedLocal;
+	//float angleLocal;
+	//float xLocal = x;
+
+	//int selectedAngleLocal;
+	//int selectedSpeedLocal;
+
+	//asm volatile (
+
+	//	"  lfs   14,%[minAng]                     \n" // Next Angle
+	//	"  li    15, 0x0                           \n" // AngleCounter
+	//	"  lfs 27, %[delD]                  \n" // load in delta time
+	//	"  la 19, %[tanAngleRad]                \n" //load in angleRads
+	//	"  la 20, %[cosX2Inv]                   \n" // load in cosX2inverse
+	//	"  la 21, %[speedArray]                 \n" //Speed array
+	//	"while:                            		\n" // Main while loop
+	//	"  lfs   16,%[maxAng]                    \n" // Max Angle
+	//	"  fcmpu 0, 14, 16                        \n" // Compare nextAngle and MaxAngle
+	//	"  bgt endWhile                         \n" // branch greater than - Exit while loop
+
+	//	"  lfs 18, %[minSped]                   \n" // Next Speed - 
+
+	//	//float XTimesTanAngleRads(x * tanAngleRads);
+	//	"  lfs 19,0x0(19)                      \n" // tanAngleRads float - tanAngleRads
+
+	//	"  lfs 24, %[xVal]                    \n" // Load in X
+	//	"  fmul 25, 24, 19                     \n" // x * tanAngleRads - XTimesTanAngleRads
+
+	//	"  li   17, 0x0                          \n" //Speed Counter
+
+	//	"  do:                                   \n"
+	//	"     lfs 21,0x0(21)                      \n" // speedArray float
+
+	//	// float InverseTwoTimesSquareOfCosAngleRadTimesGravity(cosX2Inverse[angleCounter] * gravityTimesX);
+	//	"     lfs 22, %[gravTimX]                \n" // load in gravity Times X
+	//	"     lfs 20,0x0(20)                     \n" // (cosX2Inverse[angleCounter] float
+	//	"     fmul 23, 20, 22                    \n" // (cosX2Inverse[angleCounter] * gravityTimesX - InverseTwoTimesSquareOfCosAngleRadTimesGravity
+
+	//	"     fmul 23, 21, 23                     \n" // speeds[speedCounter] * (cosX2Inverse[angleCounter] * gravityTimesX) 
+	//	"     fadd 23, 23, 25                    \n" //  ^^ + XTimesTanAngleRads
+
+	//	"     lfs 26, %[crossMarg]               \n" // Load in The crossbar Margin
+	//	"     fcmpu 0, 26, 23                    \n" // Compare height(InversenextSpeedSquared * InverseTwoTimesSquareOfCosAngleRadTimesGravity + XTimesTanAngleRads) With Crossbar margin
+	//	"     bgt else                           \n" // branch if greater than to the else
+	//	"     stfs 18, %[speedP]                 \n" // store next speed in the speed pointer - probably wont work
+	//	"     stfs 14, %[angleP]                  \n" // store next angle in the angle pointer - probably wont work
+	//	"     sth 15, %[angSel]                  \n" // store the angle counter in the selected angle global - probably wont work
+	//	"     sth 17, %[spedSel]                 \n" // store the speed counter in the selected speed global - probably wont work
+	//	"     b endWhile                         \n" // branch to end of loop - found solution
+	//	"     else:                              \n" // else condition - if the other wasnt true
+	//	"       fadd 18, 18, 27                  \n" // increment next speed by deltaD
+	//	"     after:                             \n" // To be ran after the conditional statments
+	//	"       addi 17, 17, 0x1                   \n" // increment speed counter
+
+	//	"      lwzu  30, 0x4(21)                  \n" // update the speed array to next part
+
+	//	"      lfs   28, %[maxSped]              \n" // load in max speed
+	//	"      fcmpu 0, 18, 28                     \n" // compare next speed and max speed 
+	//	"      bgt   endDo                       \n" // if nextSpeed > maxSpeed then go to end of do loop
+	//	"      b do                              \n" // ^^^^ else start the do again ^^^^
+	//	"  endDo:                                \n" // Once the do is finished
+	//	"    addi 15, 15, 0x1                      \n" // increment angle counter
+	//	"    fadd 14, 14, 27                      \n" // add delta d to next Angle
+	//	"    lwzu  30, 0x4(19)                    \n" // move along tanAnglesValues
+	//	"    lwzu  30, 0x4(20)                    \n" // cosX2Inverse
+	//	"    b while                             \n" // go back to beginning of while loop
+
+	//	"endWhile:								 \n" // part of end of program
+
+
+
+
+	//	:[angSel] "=m" (selectedAngleLocal),
+	//	[spedSel] "=m" (selectedSpeedLocal),
+	//	 [speedP] "=m" (speedLocal),
+	//	 [angleP] "=m" (angleLocal)
+
+	//    : 
+	//	[maxAng] "m" (maxAngle),
+	//	[tanAngleRad] "m" (tanAnglesValues[0]),
+	//	[cosX2Inv] "m" (cosX2Inverse[0]),
+	//	[speedArray] "m" (speeds[0]),
+	//	[gravTimX] "m" (gravityTimesX),
+	//	[xVal] "m" (xLocal),
+	//	[crossMarg] "m" (crossbarPlusMargin),
+	//	[minSped] "m" (minSpeed),
+	//	[delD] "m" (deltaD),
+	//	[maxSped] "m" (maxSpeed),
+	//	[minAng] "m" (minAngle)
+
+
+	//	: "fr14", "fr15", "fr16", "fr17", "fr18", "fr19", "fr20", "fr21", "fr22", "fr23", "fr24", "fr25", "fr26", "fr27", "fr28", "fr29", "fr30", "r19", "r20", "r21", "r17", "ctr"
+
+	//	); // end of inline ASM
+
+	//speed = &speedLocal;
+	//angle = &angleLocal;
+
+	//angleSelected = selectedAngleLocal;
+	//speedSelected = selectedSpeedLocal;
+
+
+
+
 	while (!(foundCombo || (nextAngle > maxAngle)))				// Think de Morgan's Theory, perhaps.
 	{
 		float nextSpeed(minSpeed);
@@ -546,12 +651,12 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 		float XTimesTanAngleRads(x * tanAngleRads);
 
 		float InverseTwoTimesSquareOfCosAngleRadTimesGravity(cosX2Inverse[angleCounter] * gravityTimesX);
-		
+
 		int speedCounter(0);
 
 		do {
 			float InversenextSpeedSquared(speeds[speedCounter]);
-			
+
 			float height(InversenextSpeedSquared * InverseTwoTimesSquareOfCosAngleRadTimesGravity + XTimesTanAngleRads);
 
 			//cout << nextAngle<< " - ";
@@ -563,7 +668,8 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 				angleSelected = angleCounter;
 				speedSelected = speedCounter;
 				foundCombo = true;			// ... and stop looking.
-			} else {
+			}
+			else {
 				nextSpeed += deltaD;		// Otherwise try next speed up (+0.5 m/s).#
 			}
 			speedCounter++;
@@ -578,70 +684,92 @@ bool findSHOTonGoalSpeedAndAngle(float* speed, float* angle, float x)
 // With metrics found, calculate the flight path coords. Uses 'flightPath[104][2]' array as global.
 void generateFlightPath(float speed, float angle)
 {
-	//  ...reminders..
+	//  ...reminders...
+	////const float deltaD (0.5F)
+	////const int maxDataPoints = 104
+	//// float maxHeight(8.5F);	// (m) trajectories above this height can't be displayed (out the park!)
+
 
 	float yValue(0.001F);	// ball is sitting on a tee just above the ground begin with, of course!
 	float xValue(0.0F);		// ...and hasn't moved yet.
-
 	float tanAngleRads = tanAnglesValues[angleSelected];
 	float inverseOfCos = cosSpeedsinverse[angleSelected][speedSelected];
+	float zero = 0.0;
+
+	//int i(0);
+	//for (; i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight); ++i)	// If height goes negative or too high, STOP!
+	//{
+
+	//	flightPath[i][y] = yValue;
+	//	xValue += deltaD;			// do for each increment tick across the pitch
 
 
-	int i(0);
+	//	// find the 'y' (height) for each 'x' distance using the angle and speed previously found (same equation as above)
+	//	yValue = (xValueSquaredTimesGravity[i] * inverseOfCos) + (xValue * tanAngleRads);
+	//}
+	// /*Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)*/
 
-	for (; i < maxDataPoints && (yValue > 0.0) && (yValue <= maxHeight); ++i)	// If height goes negative or too high, STOP!
-	{
-
-		flightPath[i][y] = yValue;
-		xValue += deltaD;			// do for each increment tick across the pitch
+	asm volatile (
 
 
-		// find the 'y' (height) for each 'x' distance using the angle and speed previously found (same equation as above)
-		yValue = (xValueSquaredTimesGravity[i] * inverseOfCos) + (xValue * tanAngleRads);
-	}
-	 /*Finished generating required data points, now mark end-of-data with -1.0 (dataEnd)*/
+		"   la  14,%[flightPa]				    \n" //  Load flightpath into register 5						COMPLILED
+		"	lfs	 15,%[xVal]						\n" //	Load XVal Height into register 6					COMPLILED
+		"	lfs	 16,%[yVal]						\n" //	Load YVal Height into register 7					COMPLILED
+		"   li   17,%[maxPts]				    \n" //	Load MaxPoints Height into register 8				COMPLILED
+		"	la   18,%[xValSquared]				\n" //	Flightpath = yvalue									COMPILED
 
-	//asm volatile (
-	//	"   lfs   5,%[flightPa]                \n"
-	//	"	lfs	 6,%[xVal]					\n" //	Load XVal Height into register 6 
-	//	"	lfs	 7,%[yVal]					\n" //	Load YVal Height into register 7 
-	//	"   li   8,%[maxPts]-1               \n" //	Load MaxPoints Height into register 8 
-	//	"   lfs  9,%[MaxHe]                  \n" //  Load Max Height into register 9 
-	//	"	lfs	 10,%[delD]					\n" //	Load DeltaD into register 10
-	//	"   la   11, %[xValSquared]           \n"
+		"  mtctr 17					\n" //	set the counter to run r8 times (maxpoints)			COMPILED
+		"for:                            		\n"
+		"  lfs  19, %[zer]	                        \n"
+		"  fcmpu 0, 16, 19							\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0													COMPILED
+		"  ble endif							\n" //	If compare is faulse then go straight to endif		COMPILED
 
-	//	"  mtctr 8						    \n" //	set the counter to run r8 times (maxpoints)
-	//"for:  lwzu  8, 0x8(5)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path
-	//	"  lwzu  8, 0x4(11)                   \n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity
-	//	"  cmpd  7, 0x0						\n" //	Compare if yValue is greater than    =    R6(yVal) > 0.0
-	//	"  ble endif                        \n" //	If compare is faulse then go straight to endif
+		"  lfs  19,%[MaxHe]					    \n" //  Load Max Height into register 9						COMPILED HAD TO REMOVE CONST FROM MAX HEIGHTS!?
+		"  fcmpu 0, 16, 19						\n" // Check if yValue > MaxHeight				//DOES NOT COMPILE "error : unsupported relocation against maxHe" Changed it to r9
+		"  bgt endif							\n" // If compare is false then go straight to endif         COMPILED       
 
-	//	"  lfs   15, %[yVal]-1                \n" // Load yVal value - 1(So its equal to) into register                 
-	//	"  cmpd maxHe, 15                   \n" // Check if MaxHeight > yValue-1
-	//	"  ble endif                        \n" // If compare is false then go straight to endif
+		"  stfs  16, 0x0(14)				        \n" //
 
-	//	"  fadd  6,6,10						\n" //Increment XVal
-	//	"  fmul  7, %[xValSquared], %[invCos] \n" // Multiply  (xValueSquaredTimesGravity[i] * inverseOfCos) First 
-	//	"  fadd  7, %[xVal], %[tanAngRad]    \n" // Then add (xValue * tanAngleRads) Nexy
-	//"endif:									\n" // 
-	//	"  bc 16,0,for						\n" // Check if the CTR - 16 reg is 0 If not REPEAT
+		"  lfs  17,%[delD]				    \n" //	load delta time
+		"  fadd 15, 15,17                       \n" // add deltaD
 
-	//	: 
-	//	  
- //		: 
-	//	  [flightPa] "m" (flightPath[0][1])
-	//	  [xVal] "m" (xValue),
-	//	  [yVal] "m" (yValue),
-	//	  [maxPts] "m" (maxDataPoints),	   // input list
-	//	  [MaxHe] "m" (maxHeight),
-	//	  [delD] "m" (deltaD),
-	//	  [xValSquared] "m" (xValueSquaredTimesGravity[0]),
-	//	  [invCos] "m" (inverseOfCos),
-	//	  [tanAngRad] "m" (tanAngleRads)
-	//	: "fr5", "fr6", "fr7", "r8", "fr9", "fr10", "ctr", "cc" // clobber list
+		"  lfs   19,%[invCos]				    \n" //	invcos load in
+		"  lfs 12,0x0(18)                      \n"
+		"  fmul 17, 12, 19                         \n " //xValueSquaredTimesGravity[i] * inverseOfCos
 
-	//	); // end of inline ASM
-}
+		"  lfs   19,%[tanAngRad]				    \n" //	tangle load in
+		"  fmul   19, 15,19                         \n" //xValue * tanAngleRads
+
+		"  fadd 16, 19, 17                        \n" //(xValueSquaredTimesGravity[i] * inverseOfCos) + (xValue * tanAngleRads)
+
+
+		"  lwzu  19, 0x8(14)                     \n"//  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - Flight Path						COMPILED
+		"  lwzu  17, 0x4(18)					\n" //  load automatically (u)pdates EA to next Float mark 4 bytes on in memory - xValueSquaredTimesGravity			COMPILED
+		"endif:									\n" // 
+		"  bc 16,0,for							\n" // Check if the CTR - 16 reg is 0 If not REPEAT
+
+
+
+
+		:
+	: [flightPa]"m" (flightPath[0][1]),	//Output List
+		[xVal] "m" (xValue),					// input list
+		[yVal] "m" (yValue),
+		[maxPts] "i" (maxDataPoints),
+		[MaxHe] "m" (maxHeight),
+		[delD] "m" (deltaD),
+		[xValSquared] "m" (xValueSquaredTimesGravity[0]),
+		[invCos] "m" (inverseOfCos),
+		[tanAngRad] "m" (tanAngleRads),
+		[zer] "m" (zero)
+
+
+
+
+		: "fr5", "fr6", "fr7", "fr8", "r8", "fr9", "fr10", "fr11", "fr12", "fr13", "fr14", "fr15", "fr16", "ctr"
+
+		); // end of inline ASM
+};
 
 //************************************ Supporting functions *******************************************************
 //*****************************************************************************************************************
